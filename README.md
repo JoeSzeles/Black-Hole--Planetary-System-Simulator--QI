@@ -9,3 +9,4 @@ The simulation runs in a loop until the user closes the Pygame window.
 
 it uses following modules:import, random, math
 
+Pressing Space bar will delete the projected trajectories, and start drawing them again fresh
