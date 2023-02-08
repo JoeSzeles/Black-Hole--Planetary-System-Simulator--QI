@@ -1,11 +1,18 @@
 import pygame
 import random
 import math
-
+import numpy as np
+scalefactor = 100
 c = 299792458 # speed of light
 G = 6.67430e-11 # gravitational constant
 Theta =8.8*10**26
 WINDOW_SIZE = (1800, 1000)
+DT = 0.003  # time step in seconds
+particle_amount=200
+black_hole_mass = 5*10**14
+
+
+
 # Initialize Pygame
 pygame.init()
 
@@ -17,16 +24,27 @@ screen.fill((0, 0, 0))
 
 # List to store particles representing the stars
 particles = []
+black_holes=[]
+
+black_hole = {
+    'x': WINDOW_SIZE[0] / 2,
+    'y': WINDOW_SIZE[1] / 2,
+    'vx': random.uniform(-300, 300),
+    'vy': random.uniform(-300, 300),
+    'ax': 0,
+    'ay': 0
+}
+
 
 # Add the black hole
-black_hole_mass = 25*10**15
+
 black_hole_x, black_hole_y = WINDOW_SIZE[0]/2, WINDOW_SIZE[1]/2
 
 
 # Add 100 particles to the list
-for i in range(150):
+for i in range(particle_amount):
      pradius = random.uniform(3, 12)
-     m_i = random.uniform(1*10**7, 2*10**12)
+     m_i = random.uniform(1*10**5, 2*10**11)
      particles.append([random.randint(0, 1800), random.randint(0, 1000), random.randint(-10, 10), random.randint(-10, 10), m_i, pradius])
 
 # Create a list to store the position of each particle at each time step
@@ -49,9 +67,18 @@ while running:
             positions = []
             for i in range(len(particles)):
                 positions.append([])
+                
+        elif event.type == pygame.MOUSEMOTION:
+            # Update the black hole position based on the mouse position
+            black_hole_x = event.pos[0]
+            black_hole_y = event.pos[1]
+    pygame.draw.circle(screen, (255,234,180), (black_hole_x, black_hole_y), 20)        
+            
     
     # Clear the screen
     screen.fill((0, 0, 0))
+    pygame.draw.circle(screen, (255,234,180), (black_hole_x, black_hole_y), 20)
+    
     
 
 
@@ -76,12 +103,12 @@ while running:
 
 
         # Update the velocity of particle i based on the acceleration
-        particle_i[2] += ax / 10
-        particle_i[3] += ay / 10
+        particle_i[2] += ax / scalefactor
+        particle_i[3] += ay / scalefactor
 
         # Update the position of particle i based on the velocity
-        particle_i[0] += particle_i[2] / 10
-        particle_i[1] += particle_i[3] / 10
+        particle_i[0] += particle_i[2] / scalefactor
+        particle_i[1] += particle_i[3] / scalefactor
         
         # Add the current position to the list for this particle
         positions[i].append((int(particle_i[0]), int(particle_i[1])))
@@ -116,20 +143,19 @@ while running:
         ay += a * dy / r
 
         # Update the velocity of particle i based on the acceleration
-        particle_i[2] += ax / 50
-        particle_i[3] += ay / 50
+        particle_i[2] += ax + (((2 * G * black_hole_mass * c**2) / Theta)**1/4) / 50
+        particle_i[3] += ay + (((2 * G * black_hole_mass * c**2) / Theta)**1/4) / 50
 
         # Update the position of particle i based on the velocity
-        particle_i[0] += particle_i[2] / 50
-        particle_i[1] += particle_i[3] / 50
+        particle_i[0] += particle_i[2] / scalefactor
+        particle_i[1] += particle_i[3] / scalefactor
         
-        
-    #Draw the black hole
-    black_hole_x = WINDOW_SIZE[0]/2
-    black_hole_y = WINDOW_SIZE[1]/2
-    black_hole_radius = 14 # choose a radius for the black hole
-    pygame.draw.circle(screen, (5, 5, 5), (int(black_hole_x), int(black_hole_y)), int(black_hole_radius), 0)
-    pygame.draw.circle(screen, (255, 255, 255), (int(black_hole_x), int(black_hole_y)), int(black_hole_radius), 2)       
+        # Update black hole position
+
+    
+    # choose a radius for the black hole
+    #pygame.draw.circle(screen, (5, 5, 5), (int(black_hole_x), int(black_hole_y)), int(black_hole_radius), 0)
+    #pygame.draw.circle(screen, (255, 255, 255), (int(black_hole_x), int(black_hole_y)), int(black_hole_radius), 2)       
 
             
         
